@@ -2,6 +2,14 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
+        
+        "logicAppName": {
+            "defaultValue": "logic-guestreview",
+            "type": "String",
+            "metadata": {
+                "description": "Name of the Logic App"
+            }
+        },
         "functionAppName": {
             "type": "String",
             "defaultValue": "[concat('func-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",

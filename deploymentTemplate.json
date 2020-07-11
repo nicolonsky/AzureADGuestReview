@@ -76,7 +76,7 @@
         }
     },
     "variables": {
-        "nestedTemplateFolder" : "C:\\Repos\\GitHub\\AzureADGuestManagement\\03-LogicApp - Copy",
+        "nestedTemplateFolder" : "https://raw.githubusercontent.com/nicolonsky/AzureADGuestReview/master/NestedTemplates/",
         "keyVaultTemplateUrl" : "keyVault.json",
         "logicAppTemplateUrl": "logicApp.json",
         "functionAppTemplateUrl": "functionApps.json"

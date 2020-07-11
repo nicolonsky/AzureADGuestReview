@@ -16,6 +16,27 @@
                 "description": "Unique name for the Azure Function Web App"
             }
         },
+        "appServicePlanName": {
+            "type" : "string",
+            "defaultValue" : "[concat('plan-', parameters('functionAppName'))]",
+            "metadata": {
+                "description": "Name for the Azure Function Web App App service plan"
+            }
+        },
+        "storageAccountName": {
+            "type" : "string",
+            "defaultValue": "[concat('st','guestreview',substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique Name of the Storage Account"
+            }
+        },
+        "appInsightsName": {
+            "type" : "string",
+            "defaultValue" : "[concat('appi-',parameters('functionAppName'))]",
+            "metadata": {
+                "description": "Name for the Application Insights"
+            }
+        },
         "keyVaultName": {
             "type": "String",
             "defaultValue" : "[concat('kv-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
