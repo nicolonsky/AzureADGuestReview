@@ -82,9 +82,7 @@
             "type": "Microsoft.KeyVault/vaults",
             "apiVersion": "2016-10-01",
             "name": "[parameters('keyVaultName')]",
-            "dependsOn": [
-                "[resourceId('Microsoft.Logic/workflows',parameters('logicAppName'))]"
-            ],
+            "dependsOn": [],
             "location": "[resourceGroup().location]",
             "properties": {
                 "sku": {
