@@ -443,7 +443,7 @@
                                                         "Options": "Approve, Suspend, Delete",
                                                         "SelectionText": "Review access",
                                                         "Subject": "Please review access for guest account \"@{body('Parse_guest_user')?['displayName']}\"",
-                                                        "To": "@{body('Parse_Function_output')?['managerUpn']}; nicola.suter@itnetx.ch"
+                                                        "To": "@{body('Parse_Function_output')?['managerUpn']}"
                                                     },
                                                     "NotificationUrl": "@{listCallbackUrl()}"
                                                 },
