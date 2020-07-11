@@ -1,0 +1,9 @@
+{
+    "$schema": "https://aka.ms/azure-quickstart-templates-metadata-schema#",
+    "type": "QuickStart",
+    "itemDisplayName": "Azure AD guest review solution",
+    "description": "Template to deploy the Azure AD guest review solution in your tenant.",
+    "summary": "Template to deploy the Azure AD guest review solution in your tenant.",
+    "githubUsername": "nicolonsky",
+    "dateUpdated": "2020-10-07"
+  }

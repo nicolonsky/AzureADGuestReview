@@ -1,0 +1,266 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "functionAppName": {
+            "type": "String",
+            "defaultValue": "[concat('func-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique name for the Azure Function Web App"
+            }
+        },
+        "appServicePlanName": {
+            "type" : "string",
+            "defaultValue" : "[concat('plan-', parameters('functionAppName'))]",
+            "metadata": {
+                "description": "Name for the Azure Function Web App App service plan"
+            }
+        },
+        "storageAccountName": {
+            "type" : "string",
+            "defaultValue": "[concat('st','guestreview',substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique Name of the Storage Account"
+            }
+        },
+        "appInsightsName": {
+            "type" : "string",
+            "defaultValue" : "[concat('appi-',parameters('functionAppName'))]",
+            "metadata": {
+                "description": "Name for the Application Insights"
+            }
+        },
+        "keyVaultName": {
+            "type": "String",
+            "defaultValue" : "[concat('kv-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique name for the Key Vault"
+            }
+        },
+        "tenantId": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName":"TenantID",
+                "secretValue":""
+            },
+            "metadata": {
+                "description": "Your Azure AD Tenant ID"
+            }
+        },
+        "applicationId": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName":"ApplicationID",
+                "secretValue": ""
+            },
+            "metadata": {
+                "description": "Application ID of the App registration"
+            }
+        },
+        "clientSecret": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName": "ClientSecret",
+                "secretValue":""
+            },
+            "metadata": {
+                "description": "Client Secret of the App registration"
+            }
+        }
+    },
+    "variables": {
+        "fetchLastSigninAndManagerFunction" : "FetchLastSigninAndManager",
+        "populateGuestInviterFunction" : "PopulateGuestInviterAsManager",
+        "updateGuestManagementMetaFunction": "UpdateGuestManagementMeta"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "2018-11-01",
+            "name": "[parameters('functionAppName')]",
+            "location": "[resourceGroup().location]",
+            "kind": "functionapp",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "enabled": true,
+                "serverFarmId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]",
+                "siteConfig" : {
+                    "appSettings" : [
+                        {
+                            "name": "ApplicationID",
+                            "value": "[concat('@Microsoft.KeyVault(SecretUri=https://', parameters('keyVaultName'), '.vault.azure.net/secrets/',  parameters('applicationId').secretName, ')')]"
+                        },
+                        {
+                            "name": "ClientSecret",
+                            "value": "[concat('@Microsoft.KeyVault(SecretUri=https://', parameters('keyVaultName'), '.vault.azure.net/secrets/',  parameters('clientSecret').secretName, ')')]"
+                        },
+                        {
+                            "name": "TenantID",
+                            "value": "[concat('@Microsoft.KeyVault(SecretUri=https://', parameters('keyVaultName'), '.vault.azure.net/secrets/',  parameters('tenantId').secretName, ')')]"
+                        },
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1)]"
+                        },
+                        {
+                            "name": "AzureWebJobsDashboard",
+                            "value": "[concat('DefaultEndpointsProtocol=https;AccountName=', parameters('storageAccountName'), ';AccountKey=', listKeys(parameters('storageAccountName'),'2015-05-01-preview').key1)]"
+                        },
+                        {   
+                            "name" : "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~2"
+                        },
+                        {
+                            "name" : "FUNCTIONS_WORKER_RUNTIME",
+                            "value" : "powershell"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('microsoft.insights/components/', parameters('appInsightsName')), '2015-05-01').InstrumentationKey]"
+                        }
+                    ]
+                }
+            },
+            "dependsOn" : [
+                "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]"
+            ]
+        },
+       {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[parameters('appServicePlanName')]",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": false,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "name": "[parameters('storageAccountName')]",
+            "apiVersion": "2019-04-01",
+            "location": "[resourceGroup().location]",
+            "kind": "StorageV2",
+            "sku": {
+                "name": "Standard_LRS"
+            }
+        },
+        {
+            "apiVersion": "2015-05-01",
+            "name": "[parameters('appInsightsName')]",
+            "type": "Microsoft.Insights/components",
+            "kind": "web",
+            "location": "[resourceGroup().location]",
+            "tags": {
+                "[concat('hidden-link:', resourceGroup().id, '/providers/Microsoft.Web/sites/', parameters('functionAppName'))]": "Resource"
+            },
+            "properties": {
+                "Application_Type": "web",
+                "ApplicationId": "[parameters('appInsightsName')]"
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('functionAppName'), '/', variables('populateGuestInviterFunction'))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+            ],
+            "properties": {
+                    "config": {
+                    "bindings": [
+                        {
+                        "authLevel": "function",
+                        "name": "Request",
+                        "type": "httpTrigger",
+                        "direction": "in"
+                        },
+                        {
+                        "name": "Response",
+                        "type": "http",
+                        "direction": "out"
+                        }
+                    ]
+                  },
+                  "files": {
+                    "run.ps1": "using namespace System.Net\r\n\r\n# Input bindings are passed in via param block.\r\nparam($Request, $TriggerMetadata)\r\n\r\n# Write to the Azure Functions log stream.\r\nWrite-Host \"PowerShell HTTP trigger function processed a request.\"\r\n\r\n# Acquire Graph Token \/ Get Secrets from Key Vault via MSI\r\n$tenantId= $env:TenantID\r\n$authBody=@{\r\n    client_id= $env:ApplicationID\r\n    client_secret= $env:ClientSecret\r\n    scope=\"https:\/\/graph.microsoft.com\/.default\"\r\n    grant_type=\"client_credentials\"\r\n}\r\n\r\n$uri=\"https:\/\/login.microsoftonline.com\/$tenantId\/oauth2\/v2.0\/token\"\r\n$accessToken = Invoke-WebRequest -Uri $uri -ContentType \"application\/x-www-form-urlencoded\" -Body $authBody -Method Post -ErrorAction Stop\r\n$accessToken=$accessToken.content | ConvertFrom-Json\r\n$authHeader = @{\r\n    'Content-Type'='application\/json'\r\n    'Authorization'=\"Bearer \" + $accessToken.access_token\r\n    'ExpiresOn'=$accessToken.expires_in\r\n}\r\n\r\n#Take the  information from Azure Common Alert Schema for Log Analytics, \r\n# and get the query results into a format we can actually use\r\n$columns = $Request.body.data.alertContext.SearchResults.tables.columns.name\r\n$rows = $Request.body.data.alertContext.SearchResults.tables.rows\r\n \r\n#Set name-value pairs for each Search Result\r\n$arr = @()\r\n \r\nif ($Request.body.data.alertContext.ResultCount -eq 1) {\r\n    $hash = @{}\r\n    for ($i = 0; $i -lt $columns.count; $i++){ \r\n        $hash.Add($columns[$i],$rows[$i])\r\n    }\r\n    $arr += $hash\r\n}else {\r\n    $rows | ForEach-Object {\r\n        $hash = @{}\r\n        for ($i = 0; $i -lt $columns.count; $i++){ \r\n            $hash.Add($columns[$i],$_[$i])\r\n        }\r\n        $arr += $hash\r\n    }\r\n}\r\n\r\nforeach ($guestInvitation in $arr){\r\n    try{\r\n        # Deserialize JSON content of common alert scheme\r\n        $initiatedBy = $guestInvitation.InitiatedBy | ConvertFrom-Json\r\n        $targetResources =  $guestInvitation.TargetResources | ConvertFrom-Json\r\n\r\n        Write-Host \"User: $($targetResources[0].userPrincipalName) was invited by $($initiatedBy.user.userPrincipalName)\"\r\n        \r\n        # Populate Manager\r\n        $guest = $targetResources[0].id\r\n        $inviter = $initiatedBy.user.id\r\n        $uri = \"https:\/\/graph.microsoft.com\/v1.0\/users\/$guest\/manager\/`$ref\"\r\n        $requestBody = @{\r\n            \"@odata.id\" = \"https:\/\/graph.microsoft.com\/v1.0\/users\/$inviter\"\r\n        }\r\n        $null = Invoke-WebRequest -Method Put -Body $($requestBody | ConvertTo-Json) -Uri $uri -Headers $authHeader\r\n\r\n        # Populate Extension Attributes\r\n        $uri = \"https:\/\/graph.microsoft.com\/v1.0\/users\/$guest\/extensions\"\r\n        $requestBody = @{\r\n            \"@odata.type\" = \"microsoft.graph.openTypeExtension\"\r\n            extensionName = \"ch.nicolonsky.tech.guestManagement\"\r\n            inviterId = $initiatedBy.user.id\r\n            inviterUpn = $initiatedBy.user.userPrincipalName\r\n            lastReview = $guestInvitation.TimeGenerated\r\n        }\r\n        $null = Invoke-WebRequest -Method Post -Body $($requestBody | ConvertTo-Json) -Uri $uri -Headers $authHeader\r\n\r\n        # Associate values to output bindings by calling 'Push-OutputBinding'.\r\n        Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{\r\n            StatusCode = [HttpStatusCode]::OK\r\n            Body = \"Successfuly updated guest '$($guest)'\"\r\n        })\r\n\r\n        Push-OutputBinding -Name outputBlob -Value $($Request.body | ConvertTo-Json -Depth 99)\r\n\r\n    }catch{\r\n        Write-Error $_\r\n    }\r\n}"
+                  }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('functionAppName'), '/', variables('fetchLastSigninAndManagerFunction'))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+            ],
+            "properties": {
+                    "config": {
+                    "bindings": [
+                        {
+                        "authLevel": "function",
+                        "name": "Request",
+                        "type": "httpTrigger",
+                        "direction": "in"
+                        },
+                        {
+                        "name": "Response",
+                        "type": "http",
+                        "direction": "out"
+                        }
+                    ]
+                  },
+                  "files": {
+                    "run.ps1": "using namespace System.Net\r\n\r\n# Input bindings are passed in via param block.\r\nparam($Request, $TriggerMetadata)\r\n\r\n# Write to the Azure Functions log stream.\r\nWrite-Host \"PowerShell HTTP trigger function processed a request.\"\r\n\r\n# Acquire Graph Token\r\n$tenantId= $env:TenantID\r\n$authBody=@{\r\n    client_id= $env:ApplicationID\r\n    client_secret= $env:ClientSecret\r\n    scope=\"https:\/\/graph.microsoft.com\/.default\"\r\n    grant_type=\"client_credentials\"\r\n}\r\n\r\n$uri=\"https:\/\/login.microsoftonline.com\/$tenantId\/oauth2\/v2.0\/token\"\r\n$accessToken = Invoke-WebRequest -Uri $uri -ContentType \"application\/x-www-form-urlencoded\" -Body $authBody -Method Post -ErrorAction Stop\r\n$accessToken=$accessToken.content | ConvertFrom-Json\r\n$authHeader = @{\r\n    'Content-Type'='application\/json'\r\n    'Authorization'=\"Bearer \" + $accessToken.access_token\r\n    'ExpiresOn'=$accessToken.expires_in\r\n}\r\n\r\n# Interact with query parameters or the body of the request.\r\n$userId = $Request.body.userId\r\n\r\nif ($userId) {\r\n        $body = \"Passed user: $userId\"\r\n        # Most recent sign-in\r\n        $uri = \"https:\/\/graph.microsoft.com\/v1.0\/auditLogs\/signIns?&`$filter=userId eq '$userId'&?`&`$top=1\"\r\n        \r\n        try{\r\n            $signinsRequest = Invoke-WebRequest -Uri $uri -Headers $authHeader\r\n            $signin = $signinsRequest.Content | ConvertFrom-Json | Select-Object -ExpandProperty value\r\n\r\n            if ($null -eq $signin.createdDateTime){\r\n                $lastSignin = \"no recent sign-in\"\r\n            }else{\r\n                $lastSignin = $signin.createdDateTime\r\n            }\r\n        }catch{\r\n            $lastSignin = \"no recent sign-in\"\r\n        }\r\n\r\n        # Get manager\r\n        $uri = \"https:\/\/graph.microsoft.com\/v1.0\/users\/$userId\/manager\"\r\n        try{\r\n            $managerInfo = Invoke-WebRequest -Uri $uri -Headers $authHeader\r\n            $managerInfo = $managerInfo.Content | ConvertFrom-Json\r\n            $manager = $managerInfo.userPrincipalName\r\n        }catch{\r\n            $manager = \"not available\"\r\n        }\r\n\r\n        # Get open extension info\r\n        $uri = \"https:\/\/graph.microsoft.com\/v1.0\/users\/$userId\/extensions\/ch.nicolonsky.tech.guestManagement\"\r\n        try{\r\n            $openExtensionInfo = Invoke-WebRequest -Uri $uri -Headers $authHeader\r\n            $openExtensionInfo = $openExtensionInfo.Content | ConvertFrom-Json\r\n            $lastReview = $openExtensionInfo.lastReview\r\n            $inviterId = $openExtensionInfo.inviterId\r\n            $inviterUpn = $openExtensionInfo.inviterUpn\r\n        }catch{\r\n            $lastReview = Get-Date -Date \"2000-01-01 00:00:00Z\"\r\n            $inviterId = \"not available\"\r\n            $inviterUpn = \"not available\"\r\n        }\r\n\r\n        $body = [PSCustomObject]@{\r\n            managerUpn = $manager\r\n            userId = $userId\r\n            lastSignIn = $lastSignin\r\n            lastReview = $lastReview\r\n            inviterId = $inviterId\r\n            inviterUpn = $inviterUpn\r\n        }\r\n\r\n        # Associate values to output bindings by calling 'Push-OutputBinding'.\r\n        Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{\r\n            StatusCode = [HttpStatusCode]::OK\r\n            Body = $body\r\n        })\r\n}"
+                  }
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites/functions",
+            "apiVersion": "2018-11-01",
+            "name": "[concat(parameters('functionAppName'), '/', variables('updateGuestManagementMetaFunction'))]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+            ],
+            "properties": {
+                    "config": {
+                    "bindings": [
+                        {
+                        "authLevel": "function",
+                        "name": "Request",
+                        "type": "httpTrigger",
+                        "direction": "in"
+                        },
+                        {
+                        "name": "Response",
+                        "type": "http",
+                        "direction": "out"
+                        }
+                    ]
+                  },
+                  "files": {
+                    "run.ps1": "\r\nusing namespace System.Net\r\n\r\n# Input bindings are passed in via param block.\r\nparam($Request, $TriggerMetadata)\r\n\r\n# Write to the Azure Functions log stream.\r\nWrite-Host \"PowerShell HTTP trigger function processed a request.\"\r\n\r\n# Acquire Graph Token\r\n$tenantId= $env:TenantID\r\n$authBody=@{\r\n    client_id= $env:ApplicationID\r\n    client_secret= $env:ClientSecret\r\n    scope=\"https:\/\/graph.microsoft.com\/.default\"\r\n    grant_type=\"client_credentials\"\r\n}\r\n\r\n$uri=\"https:\/\/login.microsoftonline.com\/$tenantId\/oauth2\/v2.0\/token\"\r\n$accessToken = Invoke-WebRequest -Uri $uri -ContentType \"application\/x-www-form-urlencoded\" -Body $authBody -Method Post -ErrorAction Stop\r\n$accessToken=$accessToken.content | ConvertFrom-Json\r\n$authHeader = @{\r\n    'Content-Type'='application\/json'\r\n    'Authorization'=\"Bearer \" + $accessToken.access_token\r\n    'ExpiresOn'=$accessToken.expires_in\r\n}\r\n\r\n# Interact with query parameters or the body of the request.\r\n$guest = $Request.body.guestUserId\r\n\r\nif ($guest){\r\n    # Update Extension Attributes\r\n    $uri = \"https:\/\/graph.microsoft.com\/v1.0\/users\/$guest\/extensions\/ch.nicolonsky.tech.guestManagement\"\r\n    $requestBody = @{\r\n                inviterId = $Request.body.inviterId\r\n                inviterUpn = $Request.body.inviterUpn\r\n                lastReview = $Request.body.lastReview\r\n            }\r\n    $null = Invoke-WebRequest -Method Patch -Body $($requestBody | ConvertTo-Json) -Uri $uri -Headers $authHeader\r\n}"
+                  }
+            }
+        }
+    ]
+}

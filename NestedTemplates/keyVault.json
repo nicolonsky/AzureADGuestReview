@@ -1,0 +1,137 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "logicAppName": {
+            "defaultValue": "logic-guestreview",
+            "type": "String",
+            "metadata": {
+                "description": "Name of the Logic App"
+            }
+        },
+        "functionAppName": {
+            "type": "String",
+            "defaultValue": "[concat('func-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique name for the Azure Function Web App"
+            }
+        },
+        "keyVaultName": {
+            "type": "String",
+            "defaultValue" : "[concat('kv-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique name for the Key Vault"
+            }
+        },
+        "tenantId": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName":"TenantID",
+                "secretValue":""
+            },
+            "metadata": {
+                "description": "Your Azure AD Tenant ID"
+            }
+        },
+        "applicationId": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName":"ApplicationID",
+                "secretValue": ""
+            },
+            "metadata": {
+                "description": "Application ID of the App registration"
+            }
+        },
+        "clientSecret": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName": "ClientSecret",
+                "secretValue":""
+            },
+            "metadata": {
+                "description": "Client Secret of the App registration"
+            }
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.KeyVault/vaults",
+            "apiVersion": "2016-10-01",
+            "name": "[parameters('keyVaultName')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Logic/workflows',parameters('logicAppName'))]"
+            ],
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "sku": {
+                    "family": "A",
+                    "name": "Standard"
+                },
+                "tenantId": "[subscription().tenantid]",
+                "accessPolicies": [
+                    {
+                        "tenantId": "[subscription().tenantid]",
+                        "objectId": "[reference(resourceId('Microsoft.Logic/workflows', parameters('logicAppName')), '2017-07-01', 'full').identity.principalId]",
+                        "permissions": {
+                            "keys": [],
+                            "secrets": [
+                                "Get"
+                            ],
+                            "certificates": []
+                        }
+                    },
+                    {
+                        "tenantId": "[subscription().tenantid]",
+                        "objectId": "[reference(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '2018-11-01', 'full').identity.principalId]",
+                        "permissions": {
+                            "keys": [],
+                            "secrets": [
+                                "Get"
+                            ],
+                            "certificates": []
+                        }
+                    }
+                ],
+                "enabledForDeployment": false,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": false,
+                "enableSoftDelete": false
+            }
+        },
+        {
+            "type":"Microsoft.KeyVault/vaults/secrets",
+            "name":"[concat(parameters('keyVaultName'), '/', parameters('tenantId').secretName)]",
+            "apiVersion":"2015-06-01",
+            "properties":{
+              "value":"[parameters('tenantId').secretValue]"
+            },
+            "dependsOn":[
+              "[resourceId('Microsoft.KeyVault/vaults',parameters('keyVaultName'))]"
+            ]
+        },
+        {
+            "type":"Microsoft.KeyVault/vaults/secrets",
+            "name":"[concat(parameters('keyVaultName'), '/', parameters('clientSecret').secretName)]",
+            "apiVersion":"2015-06-01",
+            "properties":{
+              "value":"[parameters('clientSecret').secretValue]"
+            },
+            "dependsOn":[
+              "[resourceId('Microsoft.KeyVault/vaults',parameters('keyVaultName'))]"
+            ]
+        },
+        {
+            "type":"Microsoft.KeyVault/vaults/secrets",
+            "name":"[concat(parameters('keyVaultName'), '/', parameters('applicationId').secretName)]",
+            "apiVersion":"2015-06-01",
+            "properties":{
+              "value":"[parameters('applicationId').secretValue]"
+            },
+            "dependsOn":[
+              "[resourceId('Microsoft.KeyVault/vaults',parameters('keyVaultName'))]"
+            ]
+        }
+    ]
+}
