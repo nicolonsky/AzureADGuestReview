@@ -95,11 +95,14 @@
                 },
                 "parameters": {
                     "logicAppName": { "value": "[parameters('logicAppName')]" },
-                    "functionAppName": { "value": "[parameters('logicAppName')]" },
+                    "functionAppName": { "value": "[parameters('functionAppName')]" },
                     "keyVaultName": { "value" : "[parameters('keyVaultName')]" },
                     "tenantId": {"value" : "[parameters('tenantId')]" },
                     "applicationId" : {"value" : "[parameters('applicationId')]" },
-                    "clientSecret" : {"value" : "[parameters('clientSecret')]" }
+                    "clientSecret" : {"value" : "[parameters('clientSecret')]" },
+                    "appServicePlanName" : {"value" : "[parameters('appServicePlanName')]" },
+                    "appInsightsName" : {"value" : "[parameters('appInsightsName')]" },
+                    "storageAccountName" : {"value" : "[parameters('storageAccountName')]" }
                 }
             }
         },
@@ -116,11 +119,14 @@
                 },
                 "parameters": {
                     "logicAppName": { "value": "[parameters('logicAppName')]" },
-                    "functionAppName": { "value": "[parameters('logicAppName')]" },
+                    "functionAppName": { "value": "[parameters('functionAppName')]" },
                     "keyVaultName": { "value" : "[parameters('keyVaultName')]" },
                     "tenantId": {"value" : "[parameters('tenantId')]" },
                     "applicationId" : {"value" : "[parameters('applicationId')]" },
-                    "clientSecret" : {"value" : "[parameters('clientSecret')]" }
+                    "clientSecret" : {"value" : "[parameters('clientSecret')]" },
+                    "appServicePlanName" : {"value" : "[parameters('appServicePlanName')]" },
+                    "appInsightsName" : {"value" : "[parameters('appInsightsName')]" },
+                    "storageAccountName" : {"value" : "[parameters('storageAccountName')]" }
                 }
             }
         },
@@ -137,7 +143,7 @@
                 },
                 "parameters": {
                     "logicAppName": { "value": "[parameters('logicAppName')]" },
-                    "functionAppName": { "value": "[parameters('logicAppName')]" },
+                    "functionAppName": { "value": "[parameters('functionAppName')]" },
                     "keyVaultName": { "value" : "[parameters('keyVaultName')]" },
                     "tenantId": {"value" : "[parameters('tenantId')]" },
                     "applicationId" : {"value" : "[parameters('applicationId')]" },

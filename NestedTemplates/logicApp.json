@@ -101,8 +101,7 @@
             "apiVersion": "2017-07-01",
             "name": "[parameters('logicAppName')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Web/connections',variables('office365ConnectionName'))]",
-                "[resourceId('Microsoft.Web/sites', parameters('functionAppName'))]"
+                "[resourceId('Microsoft.Web/connections',variables('office365ConnectionName'))]"
             ],
             "location": "[resourceGroup().location]",
             "identity": {
