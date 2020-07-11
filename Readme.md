@@ -13,7 +13,10 @@ Prerequisites:
 Post deployment steps:
 
 * Authorize 'Office 365 Outlook' API Connection in the Azure Portal with the Account you want to send your notification e-mails
-* Add an alert rule to your log analytics workspace to trigger the 'PopulateGuestInviterAsManager' Function
+* Create an action group for your log analytics workspace to trigger the Azure Function: 'PopulateGuestInviterAsManager'
+    * Enable the common alert scheme
+* Add an alert rule to your log analytics workspace which triggers the action group
+    * Choose custom log search
 ```
 AuditLogs
 | where OperationName == 'Invite external user' and Result == 'success'
