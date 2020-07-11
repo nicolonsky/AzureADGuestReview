@@ -1,0 +1,281 @@
+{
+  "schemaId": "azureMonitorCommonAlertSchema",
+  "data": {
+    "essentials": {
+      "monitorCondition": "Fired",
+      "alertContextVersion": "1.1",
+      "severity": "Sev0",
+      "alertRule": "Trigger function",
+      "alertTargetIDs": [
+        "/subscriptions/261f3711-6ea0-41fd-9071-e9bd61af70f1/resourcegroups/rg-workplace-security/providers/microsoft.operationalinsights/workspaces/la-workplace-security"
+      ],
+      "signalType": "Log",
+      "alertId": "/subscriptions/261f3711-6ea0-41fd-9071-e9bd61af70f1/providers/Microsoft.AlertsManagement/alerts/1d2a0a56-64b3-4a3e-8945-b3ea01ad9af2",
+      "description": "",
+      "essentialsVersion": "1.0",
+      "originAlertId": "56388e43-52b0-4244-8c62-f6009eadb3ed",
+      "firedDateTime": "2020-07-02T05:36:30.7296797Z",
+      "monitoringService": "Log Analytics"
+    },
+    "alertContext": {
+      "SearchQuery": "AuditLogs\n| where OperationName == 'Invite external user' and Result == 'success'",
+      "SearchIntervalEndtimeUtc": "2020-07-02T05:34:14Z",
+      "LinkToFilteredSearchResultsAPI": "https://api.loganalytics.io/v1/workspaces/5b066528-e140-4af9-8aac-405a6718c770/query?query=AuditLogs%0A%7C%20where%20OperationName%20%3D%3D%20%27Invite%20external%20user%27%20and%20Result%20%3D%3D%20%27success%27&timespan=2020-07-02T05%3a29%3a14.0000000Z%2f2020-07-02T05%3a34%3a14.0000000Z",
+      "Threshold": 0,
+      "SearchResults": {
+        "tables": [
+          {
+            "columns": [
+              {
+                "type": "string",
+                "name": "TenantId"
+              },
+              {
+                "type": "string",
+                "name": "SourceSystem"
+              },
+              {
+                "type": "datetime",
+                "name": "TimeGenerated"
+              },
+              {
+                "type": "string",
+                "name": "ResourceId"
+              },
+              {
+                "type": "string",
+                "name": "OperationName"
+              },
+              {
+                "type": "string",
+                "name": "OperationVersion"
+              },
+              {
+                "type": "string",
+                "name": "Category"
+              },
+              {
+                "type": "string",
+                "name": "ResultType"
+              },
+              {
+                "type": "string",
+                "name": "ResultSignature"
+              },
+              {
+                "type": "string",
+                "name": "ResultDescription"
+              },
+              {
+                "type": "long",
+                "name": "DurationMs"
+              },
+              {
+                "type": "string",
+                "name": "CorrelationId"
+              },
+              {
+                "type": "string",
+                "name": "Resource"
+              },
+              {
+                "type": "string",
+                "name": "ResourceGroup"
+              },
+              {
+                "type": "string",
+                "name": "ResourceProvider"
+              },
+              {
+                "type": "string",
+                "name": "Identity"
+              },
+              {
+                "type": "string",
+                "name": "Level"
+              },
+              {
+                "type": "string",
+                "name": "Location"
+              },
+              {
+                "type": "dynamic",
+                "name": "AdditionalDetails"
+              },
+              {
+                "type": "string",
+                "name": "Id"
+              },
+              {
+                "type": "dynamic",
+                "name": "InitiatedBy"
+              },
+              {
+                "type": "string",
+                "name": "LoggedByService"
+              },
+              {
+                "type": "string",
+                "name": "Result"
+              },
+              {
+                "type": "string",
+                "name": "ResultReason"
+              },
+              {
+                "type": "dynamic",
+                "name": "TargetResources"
+              },
+              {
+                "type": "string",
+                "name": "AADTenantId"
+              },
+              {
+                "type": "string",
+                "name": "ActivityDisplayName"
+              },
+              {
+                "type": "datetime",
+                "name": "ActivityDateTime"
+              },
+              {
+                "type": "string",
+                "name": "AADOperationType"
+              },
+              {
+                "type": "string",
+                "name": "Type"
+              }
+            ],
+            "name": "PrimaryResult",
+            "rows": [
+              [
+                "5b066528-e140-4af9-8aac-405a6718c770",
+                "Azure AD",
+                "2020-07-02T05:30:40.406Z",
+                "/tenants/7955e1b3-cbad-49eb-9a84-e14aed7f3400/providers/Microsoft.aadiam",
+                "Invite external user",
+                "1.0",
+                "UserManagement",
+                "",
+                "None",
+                "<null>",
+                0,
+                "ebc53ec7-97dc-4eea-bc9f-5370950f7011",
+                "Microsoft.aadiam",
+                "Microsoft.aadiam",
+                "",
+                "",
+                "",
+                "",
+                "[{\"key\":\"InvitationId\",\"value\":\"dc387aa2-c04e-4e74-b045-a2a16b2bb11e\"},{\"key\":\"invitedUserEmailAddress\",\"value\":\"nicolasuter@outlook.com\"}]",
+                "Invited Users_ebc53ec7-97dc-4eea-bc9f-5370950f7011_YBJMS_944956",
+                "{\"user\":{\"id\":\"36c9b091-fe88-4dc2-a9e1-2662020b4bab\",\"displayName\":null,\"userPrincipalName\":\"nicola@nicolasuter.ch\",\"ipAddress\":null,\"roles\":[]}}",
+                "Invited Users",
+                "success",
+                "<null>",
+                "[{\"id\":\"975a63d4-1697-433b-993e-9254a009023b\",\"displayName\":\"nicolasuter\",\"type\":\"User\",\"userPrincipalName\":\"nicolasuter_outlook.com#EXT#@nicolasuter.onmicrosoft.com\",\"modifiedProperties\":[],\"administrativeUnits\":[]}]",
+                "7955e1b3-cbad-49eb-9a84-e14aed7f3400",
+                "Invite external user",
+                "2020-07-02T05:30:40Z",
+                "Add",
+                "AuditLogs"
+              ]
+            ]
+          }
+        ],
+        "dataSources": [
+          {
+            "resourceId": "/subscriptions/261f3711-6ea0-41fd-9071-e9bd61af70f1/resourcegroups/rg-workplace-security/providers/microsoft.operationalinsights/workspaces/la-workplace-security",
+            "region": "northeurope",
+            "tables": [
+              "AuditLogs"
+            ]
+          }
+        ],
+        "statistics": {
+          "query": {
+            "executionTime": 0.015614,
+            "resourceUsage": {
+              "cpu": {
+                "user": "00:00:00",
+                "totalCpu": "00:00:00.0312500",
+                "kernel": "00:00:00.0312500"
+              },
+              "memory": {
+                "peakPerNode": 117477520
+              },
+              "cache": {
+                "shards": {
+                  "cold": {
+                    "hitbytes": 0,
+                    "missbytes": 0,
+                    "retrievebytes": 0
+                  },
+                  "hot": {
+                    "hitbytes": 0,
+                    "missbytes": 0,
+                    "retrievebytes": 0
+                  },
+                  "bypassbytes": 0
+                },
+                "memory": {
+                  "misses": 0,
+                  "total": 0,
+                  "hits": 0
+                },
+                "disk": {
+                  "misses": 0,
+                  "total": 0,
+                  "hits": 0
+                }
+              }
+            },
+            "inputDatasetStatistics": {
+              "shards": {
+                "queriesGeneric": 0,
+                "queriesSpecialized": 0
+              },
+              "extents": {
+                "scanned": 0,
+                "scannedMinDatetime": "0001-01-01T00:00:00Z",
+                "scannedMaxDatetime": "0001-01-01T00:00:00Z",
+                "total": 0
+              },
+              "rows": {
+                "total": 0,
+                "scanned": 0
+              },
+              "rowstores": {
+                "scannedRows": 3,
+                "scannedValuesSize": 10423
+              }
+            },
+            "datasetStatistics": [
+              {
+                "tableSize": 990,
+                "tableRowCount": 1
+              }
+            ]
+          }
+        }
+      },
+      "WorkspaceId": "5b066528-e140-4af9-8aac-405a6718c770",
+      "LinkToFilteredSearchResultsUI": "https://portal.azure.com#@7955e1b3-cbad-49eb-9a84-e14aed7f3400/blade/Microsoft_Azure_Monitoring_Logs/LogsBlade/source/Alerts.EmailLinks/scope/%7B%22resources%22%3A%5B%7B%22resourceId%22%3A%22%2Fsubscriptions%2F261f3711-6ea0-41fd-9071-e9bd61af70f1%2FresourceGroups%2FRG-Workplace-Security%2Fproviders%2FMicrosoft.OperationalInsights%2Fworkspaces%2Fla-workplace-security%22%7D%5D%7D/q/eJwdyjsKgDAQBcDeU2yXU6SwFETBGyzxoYGYyH7UwsMLTj29r9nGtmn30r1DQPMJYcutTnyAYqQw1CsbCI9BKhdyhQTiutIC9WJ%2FUk8JquED/prettify/1/timespan/2020-07-02T05%3a29%3a14.0000000Z%2f2020-07-02T05%3a34%3a14.0000000Z",
+      "ResultCount": 1,
+      "SearchIntervalDurationMin": "5",
+      "Operator": "Greater Than",
+      "LinkToSearchResults": "https://portal.azure.com#@7955e1b3-cbad-49eb-9a84-e14aed7f3400/blade/Microsoft_Azure_Monitoring_Logs/LogsBlade/source/Alerts.EmailLinks/scope/%7B%22resources%22%3A%5B%7B%22resourceId%22%3A%22%2Fsubscriptions%2F261f3711-6ea0-41fd-9071-e9bd61af70f1%2FresourceGroups%2FRG-Workplace-Security%2Fproviders%2FMicrosoft.OperationalInsights%2Fworkspaces%2Fla-workplace-security%22%7D%5D%7D/q/eJwdyjsKgDAQBcDeU2yXU6SwFETBGyzxoYGYyH7UwsMLTj29r9nGtmn30r1DQPMJYcutTnyAYqQw1CsbCI9BKhdyhQTiutIC9WJ%2FUk8JquED/prettify/1/timespan/2020-07-02T05%3a29%3a14.0000000Z%2f2020-07-02T05%3a34%3a14.0000000Z",
+      "LinkToSearchResultsAPI": "https://api.loganalytics.io/v1/workspaces/5b066528-e140-4af9-8aac-405a6718c770/query?query=AuditLogs%0A%7C%20where%20OperationName%20%3D%3D%20%27Invite%20external%20user%27%20and%20Result%20%3D%3D%20%27success%27&timespan=2020-07-02T05%3a29%3a14.0000000Z%2f2020-07-02T05%3a34%3a14.0000000Z",
+      "IncludedSearchResults": "True",
+      "IncludeSearchResults": true,
+      "AlertType": "Number of results",
+      "SeverityDescription": "Low",
+      "SearchIntervalStartTimeUtc": "2020-07-02T05:29:14Z",
+      "SearchIntervalInMinutes": "5",
+      "AffectedConfigurationItems": [
+        "/tenants/7955e1b3-cbad-49eb-9a84-e14aed7f3400/providers/Microsoft.aadiam"
+      ]
+    }
+  }
+}

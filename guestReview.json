@@ -1,0 +1,163 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "logicAppName": {
+            "defaultValue": "logic-guestreview",
+            "type": "String",
+            "metadata": {
+                "description": "Name of the Logic App"
+            }
+        },
+        "functionAppName": {
+            "type": "String",
+            "defaultValue": "[concat('func-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique name for the Azure Function Web App"
+            }
+        },
+        "appServicePlanName": {
+            "type" : "string",
+            "defaultValue" : "[concat('plan-', parameters('functionAppName'))]",
+            "metadata": {
+                "description": "Name for the Azure Function Web App App service plan"
+            }
+        },
+        "storageAccountName": {
+            "type" : "string",
+            "defaultValue": "[concat('st','guestreview',substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique Name of the Storage Account"
+            }
+        },
+        "appInsightsName": {
+            "type" : "string",
+            "defaultValue" : "[concat('appi-',parameters('functionAppName'))]",
+            "metadata": {
+                "description": "Name for the Application Insights"
+            }
+        },
+        "keyVaultName": {
+            "type": "String",
+            "defaultValue" : "[concat('kv-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "metadata": {
+                "description": "Unique name for the Key Vault"
+            }
+        },
+        "tenantId": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName":"TenantID",
+                "secretValue":""
+            },
+            "metadata": {
+                "description": "Your Azure AD Tenant ID"
+            }
+        },
+        "applicationId": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName":"ApplicationID",
+                "secretValue": ""
+            },
+            "metadata": {
+                "description": "Application ID of the App registration"
+            }
+        },
+        "clientSecret": {
+            "type": "secureObject",
+            "defaultValue": {
+                "secretName": "ClientSecret",
+                "secretValue":""
+            },
+            "metadata": {
+                "description": "Client Secret of the App registration"
+            }
+        }
+    },
+    "variables": {
+        "nestedTemplateFolder" : "https://raw.githubusercontent.com/nicolonsky/AzureADGuestReview/master/NestedTemplates/",
+        "keyVaultTemplateUrl" : "keyVault.json",
+        "logicAppTemplateUrl": "logicApp.json",
+        "functionAppTemplateUrl": "functionApps.json"
+    },
+    "resources": [
+        {
+            "name": "keyVault",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'logicApp')]",
+                "[resourceId('Microsoft.Resources/deployments', 'functionApps')]"
+                ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                "uri": "[concat(variables('nestedTemplateFolder'), variables('keyVaultTemplateUrl'))]",
+                "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "logicAppName": { "value": "[parameters('logicAppName')]" },
+                    "functionAppName": { "value": "[parameters('functionAppName')]" },
+                    "keyVaultName": { "value" : "[parameters('keyVaultName')]" },
+                    "tenantId": {"value" : "[parameters('tenantId')]" },
+                    "applicationId" : {"value" : "[parameters('applicationId')]" },
+                    "clientSecret" : {"value" : "[parameters('clientSecret')]" },
+                    "appServicePlanName" : {"value" : "[parameters('appServicePlanName')]" },
+                    "appInsightsName" : {"value" : "[parameters('appInsightsName')]" },
+                    "storageAccountName" : {"value" : "[parameters('storageAccountName')]" }
+                }
+            }
+        },
+        {
+            "name": "logicApp",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "dependsOn": [ 
+                 "[resourceId('Microsoft.Resources/deployments', 'functionApps')]"
+             ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                "uri": "[concat(variables('nestedTemplateFolder'), variables('logicAppTemplateUrl'))]",
+                "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "logicAppName": { "value": "[parameters('logicAppName')]" },
+                    "functionAppName": { "value": "[parameters('functionAppName')]" },
+                    "keyVaultName": { "value" : "[parameters('keyVaultName')]" },
+                    "tenantId": {"value" : "[parameters('tenantId')]" },
+                    "applicationId" : {"value" : "[parameters('applicationId')]" },
+                    "clientSecret" : {"value" : "[parameters('clientSecret')]" },
+                    "appServicePlanName" : {"value" : "[parameters('appServicePlanName')]" },
+                    "appInsightsName" : {"value" : "[parameters('appInsightsName')]" },
+                    "storageAccountName" : {"value" : "[parameters('storageAccountName')]" }
+                }
+            }
+        },
+        {
+            "name": "functionApps",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2016-09-01",
+            "dependsOn": [],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                "uri": "[concat(variables('nestedTemplateFolder'), variables('functionAppTemplateUrl'))]",
+                "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "logicAppName": { "value": "[parameters('logicAppName')]" },
+                    "functionAppName": { "value": "[parameters('functionAppName')]" },
+                    "keyVaultName": { "value" : "[parameters('keyVaultName')]" },
+                    "tenantId": {"value" : "[parameters('tenantId')]" },
+                    "applicationId" : {"value" : "[parameters('applicationId')]" },
+                    "clientSecret" : {"value" : "[parameters('clientSecret')]" },
+                    "appServicePlanName" : {"value" : "[parameters('appServicePlanName')]" },
+                    "appInsightsName" : {"value" : "[parameters('appInsightsName')]" },
+                    "storageAccountName" : {"value" : "[parameters('storageAccountName')]" }
+                }
+            }
+        }
+    ]
+}
