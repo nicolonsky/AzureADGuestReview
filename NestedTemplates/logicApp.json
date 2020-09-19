@@ -16,30 +16,9 @@
                 "description": "Unique name for the Azure Function Web App"
             }
         },
-        "appServicePlanName": {
-            "type" : "string",
-            "defaultValue" : "[concat('plan-', parameters('functionAppName'))]",
-            "metadata": {
-                "description": "Name for the Azure Function Web App App service plan"
-            }
-        },
-        "storageAccountName": {
-            "type" : "string",
-            "defaultValue": "[concat('st','guestreview',substring(uniqueString(resourceGroup().id), 0, 6))]",
-            "metadata": {
-                "description": "Unique Name of the Storage Account"
-            }
-        },
-        "appInsightsName": {
-            "type" : "string",
-            "defaultValue" : "[concat('appi-',parameters('functionAppName'))]",
-            "metadata": {
-                "description": "Name for the Application Insights"
-            }
-        },
         "keyVaultName": {
             "type": "String",
-            "defaultValue" : "[concat('kv-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
+            "defaultValue": "[concat('kv-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
             "metadata": {
                 "description": "Unique name for the Key Vault"
             }
@@ -47,8 +26,8 @@
         "tenantId": {
             "type": "secureObject",
             "defaultValue": {
-                "secretName":"TenantID",
-                "secretValue":""
+                "secretName": "TenantID",
+                "secretValue": ""
             },
             "metadata": {
                 "description": "Your Azure AD Tenant ID"
@@ -57,7 +36,7 @@
         "applicationId": {
             "type": "secureObject",
             "defaultValue": {
-                "secretName":"ApplicationID",
+                "secretName": "ApplicationID",
                 "secretValue": ""
             },
             "metadata": {
@@ -68,7 +47,7 @@
             "type": "secureObject",
             "defaultValue": {
                 "secretName": "ClientSecret",
-                "secretValue":""
+                "secretValue": ""
             },
             "metadata": {
                 "description": "Client Secret of the App registration"
@@ -77,12 +56,12 @@
     },
     "variables": {
         "office365ConnectionName": "office365",
-        "fetchLastSigninAndManagerFunction" : "FetchLastSigninAndManager",
+        "fetchLastSigninAndManagerFunction": "FetchLastSigninAndManager",
         "updateGuestManagementMetaFunction": "UpdateGuestManagementMeta",
         "functionAppId": "[concat(resourceGroup().id,'/providers/Microsoft.Web/sites/', parameters('functionAppName'))]"
     },
     "resources": [
-    
+
         {
             "type": "Microsoft.Web/connections",
             "apiVersion": "2016-06-01",
@@ -146,12 +125,6 @@
                             }
                         },
                         "Fetch_Guest_users_from_Microsoft_Graph": {
-                            "runAfter": {
-                                "Initialize_ClientSecret": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
                             "inputs": {
                                 "authentication": {
                                     "audience": "https://graph.microsoft.com",
@@ -166,7 +139,18 @@
                                     "$select": "id,userPrincipalName, userType,mail, displayName, accountEnabled"
                                 },
                                 "uri": "https://graph.microsoft.com/v1.0/users"
-                            }
+                            },
+                            "runAfter": {
+                                "Initialize_ClientSecret": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "runtimeConfiguration": {
+                                "paginationPolicy": {
+                                    "minimumItemCount": 100000
+                                }
+                            },
+                            "type": "Http"
                         },
                         "Get_ApplicationID_from_Key_Vault": {
                             "runAfter": {
