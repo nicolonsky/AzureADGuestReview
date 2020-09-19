@@ -82,7 +82,7 @@
         "functionAppId": "[concat(resourceGroup().id,'/providers/Microsoft.Web/sites/', parameters('functionAppName'))]"
     },
     "resources": [
-    
+
         {
             "type": "Microsoft.Web/connections",
             "apiVersion": "2016-06-01",
@@ -146,12 +146,6 @@
                             }
                         },
                         "Fetch_Guest_users_from_Microsoft_Graph": {
-                            "runAfter": {
-                                "Initialize_ClientSecret": [
-                                    "Succeeded"
-                                ]
-                            },
-                            "type": "Http",
                             "inputs": {
                                 "authentication": {
                                     "audience": "https://graph.microsoft.com",
@@ -163,10 +157,22 @@
                                 "method": "GET",
                                 "queries": {
                                     "$filter": "userType eq 'Guest'",
-                                    "$select": "id,userPrincipalName, userType,mail, displayName, accountEnabled"
+                                    "$select": "id,userPrincipalName, userType,mail, displayName, accountEnabled",
+                                    "$top": "1"
                                 },
                                 "uri": "https://graph.microsoft.com/v1.0/users"
-                            }
+                            },
+                            "runAfter": {
+                                "Initialize_ClientSecret": [
+                                    "Succeeded"
+                                ]
+                            },
+                            "runtimeConfiguration": {
+                                "paginationPolicy": {
+                                    "minimumItemCount": 100000
+                                }
+                            },
+                            "type": "Http"
                         },
                         "Get_ApplicationID_from_Key_Vault": {
                             "runAfter": {
