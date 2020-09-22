@@ -102,10 +102,7 @@
                     "keyVaultName": { "value": "[parameters('keyVaultName')]" },
                     "tenantId": { "value": "[parameters('tenantId')]" },
                     "applicationId": { "value": "[parameters('applicationId')]" },
-                    "clientSecret": { "value": "[parameters('clientSecret')]" },
-                    "appServicePlanName": { "value": "[parameters('appServicePlanName')]" },
-                    "appInsightsName": { "value": "[parameters('appInsightsName')]" },
-                    "storageAccountName": { "value": "[parameters('storageAccountName')]" }
+                    "clientSecret": { "value": "[parameters('clientSecret')]" }
                 }
             }
         },
