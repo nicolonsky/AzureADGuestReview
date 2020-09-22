@@ -85,7 +85,7 @@
             },
             "properties": {
                 "enabled": true,
-                "serverFarmId": "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]",
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]",
                 "siteConfig": {
                     "appSettings": [
                         {
@@ -128,8 +128,8 @@
                 }
             },
             "dependsOn": [
-                "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]",
-                "[concat(resourceGroup().id, '/providers/Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
+                "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ]
         },
         {
