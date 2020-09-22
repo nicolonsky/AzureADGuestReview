@@ -128,8 +128,8 @@
                 }
             },
             "dependsOn": [
-                "[resourceId('/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
+                "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]",
+                "[concat(resourceGroup().id, '/providers/Microsoft.Storage/storageAccounts/', parameters('storageAccountName'))]"
             ]
         },
         {
