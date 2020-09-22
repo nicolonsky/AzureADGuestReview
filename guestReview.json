@@ -123,6 +123,7 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
+                    "logicAppName": { "value": "[parameters('logicAppName')]" },
                     "functionAppName": { "value": "[parameters('functionAppName')]" },
                     "keyVaultName": { "value": "[parameters('keyVaultName')]" },
                     "tenantId": { "value": "[parameters('tenantId')]" },
@@ -143,7 +144,6 @@
                     "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "logicAppName": { "value": "[parameters('logicAppName')]" },
                     "functionAppName": { "value": "[parameters('functionAppName')]" },
                     "keyVaultName": { "value": "[parameters('keyVaultName')]" },
                     "tenantId": { "value": "[parameters('tenantId')]" },
