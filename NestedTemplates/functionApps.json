@@ -124,7 +124,8 @@
                             "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
                             "value": "[reference(resourceId('microsoft.insights/components/', parameters('appInsightsName')), '2015-05-01').InstrumentationKey]"
                         }
-                    ]
+                    ],
+                    "powerShellVersion": "~7"
                 }
             },
             "dependsOn": [
@@ -148,12 +149,21 @@
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2019-06-01",
             "name": "[parameters('storageAccountName')]",
-            "apiVersion": "2019-04-01",
             "location": "[resourceGroup().location]",
-            "kind": "StorageV2",
             "sku": {
-                "name": "Standard_LRS"
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                }
             }
         },
         {
