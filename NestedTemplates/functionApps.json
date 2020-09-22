@@ -2,13 +2,6 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "logicAppName": {
-            "defaultValue": "logic-guestreview",
-            "type": "String",
-            "metadata": {
-                "description": "Name of the Logic App"
-            }
-        },
         "functionAppName": {
             "type": "String",
             "defaultValue": "[concat('func-','guestreview-', substring(uniqueString(resourceGroup().id), 0, 6))]",
@@ -83,7 +76,7 @@
     "resources": [
         {
             "type": "Microsoft.Web/sites",
-            "apiVersion": "2018-11-01",
+            "apiVersion": "2020-06-01",
             "name": "[parameters('functionAppName')]",
             "location": "[resourceGroup().location]",
             "kind": "functionapp",
@@ -135,31 +128,22 @@
                 }
             },
             "dependsOn": [
-                "[concat(resourceGroup().id, '/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]"
+                "[resourceId('/providers/Microsoft.Web/serverfarms/', parameters('appServicePlanName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName'))]"
             ]
         },
         {
             "type": "Microsoft.Web/serverfarms",
-            "apiVersion": "2018-02-01",
+            "apiVersion": "2020-06-01",
             "name": "[parameters('appServicePlanName')]",
             "location": "[resourceGroup().location]",
             "sku": {
                 "name": "Y1",
-                "tier": "Dynamic",
-                "size": "Y1",
-                "family": "Y",
-                "capacity": 0
+                "tier": "Dynamic"
             },
-            "kind": "functionapp",
             "properties": {
-                "perSiteScaling": false,
-                "maximumElasticWorkerCount": 1,
-                "isSpot": false,
-                "reserved": false,
-                "isXenon": false,
-                "hyperV": false,
-                "targetWorkerCount": 0,
-                "targetWorkerSizeId": 0
+                "name": "[parameters('appServicePlanName')]",
+                "computeMode": "Dynamic"
             }
         },
         {
