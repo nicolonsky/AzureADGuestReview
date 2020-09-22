@@ -192,7 +192,7 @@
         },
         {
             "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
+            "apiVersion": "2020-06-01",
             "name": "[concat(parameters('functionAppName'), '/', variables('populateGuestInviterFunction'))]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
@@ -221,7 +221,7 @@
         },
         {
             "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
+            "apiVersion": "2020-06-01",
             "name": "[concat(parameters('functionAppName'), '/', variables('fetchLastSigninAndManagerFunction'))]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
@@ -250,7 +250,7 @@
         },
         {
             "type": "Microsoft.Web/sites/functions",
-            "apiVersion": "2018-11-01",
+            "apiVersion": "2020-06-01",
             "name": "[concat(parameters('functionAppName'), '/', variables('updateGuestManagementMetaFunction'))]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
