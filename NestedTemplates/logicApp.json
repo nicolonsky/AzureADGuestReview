@@ -119,7 +119,7 @@
                                     {
                                         "name": "FetchSignIn-Function-URL",
                                         "type": "string",
-                                        "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '2018-02-01').defaultHostName , '/api/', variables('fetchLastSigninAndManagerFunction'),'?code=', listkeys(concat(variables('functionAppId'), '/host/default/'),'2016-08-01').functionKeys.default)]"
+                                        "value": "Paste your Function URL here"
                                     }
                                 ]
                             }
@@ -609,7 +609,7 @@
                                     {
                                         "name": "UpdateGuestManagementMeta-Function-URL",
                                         "type": "string",
-                                        "value": "[concat('https://', reference(resourceId('Microsoft.Web/sites', parameters('functionAppName')), '2018-02-01').defaultHostName , '/api/', variables('updateGuestManagementMetaFunction'),'?code=', listkeys(concat(variables('functionAppId'), '/host/default/'),'2016-08-01').functionKeys.default)]"
+                                        "value": "Paste your Function URL here"
                                     }
                                 ]
                             }
